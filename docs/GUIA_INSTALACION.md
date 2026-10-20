@@ -20,7 +20,7 @@ No hace falta instalar Python, Java, Keycloak, Flask ni una base de datos en el 
 En una terminal, clona el repositorio y entra en la carpeta:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/ElShapie/identity-access-lab-mvp.git
 cd identity-access-lab-mvp
 ```
 
@@ -172,3 +172,4 @@ Está en <http://localhost:8081>. Las credenciales administrativas son `KEYCLOAK
 ## 10. Qué demuestra y qué no
 
 Demuestra login OIDC local, permisos en servidor, CSRF en formularios, actualización/baja SCIM y auditoría local. No demuestra MFA, integración real con OneLogin, alta automática desde un directorio externo, seguridad RFID, cámaras ni una operación de producción. Para OneLogin, usa la guía separada y un entorno autorizado con HTTPS.
+
