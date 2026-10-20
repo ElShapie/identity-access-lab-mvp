@@ -6,6 +6,11 @@ Laboratorio autocontenido para aprender el flujo de identidad digital: inicio de
 
 ## Inicio rápido
 
+```bash
+git clone https://github.com/ElShapie/identity-access-lab-mvp.git
+cd identity-access-lab-mvp
+```
+
 Requisitos: Docker Desktop o Docker Engine con el complemento `docker compose`, 4 GB de RAM disponibles y puertos locales `8000` y `8081` libres.
 
 1. Copia `.env.example` como `.env`.
