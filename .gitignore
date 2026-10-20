@@ -1,0 +1,9 @@
+.env
+__pycache__/
+tests/tmp*/
+*.py[cod]
+*.sqlite*
+data/
+.venv/
+.task-tmp/
+.pytest_cache/

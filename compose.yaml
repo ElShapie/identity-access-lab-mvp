@@ -1,0 +1,61 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.3
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:?Copia .env.example a .env}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Copia .env.example a .env}
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_HOSTNAME: http://localhost:8081
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?Falta OIDC_CLIENT_SECRET}
+      DEMO_PASSWORD_ENGINEER: ${DEMO_PASSWORD_ENGINEER:?Falta DEMO_PASSWORD_ENGINEER}
+      DEMO_PASSWORD_AUDITOR: ${DEMO_PASSWORD_AUDITOR:?Falta DEMO_PASSWORD_AUDITOR}
+      DEMO_PASSWORD_ADMIN: ${DEMO_PASSWORD_ADMIN:?Falta DEMO_PASSWORD_ADMIN}
+    ports:
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - ./keycloak/identity-access-realm.json:/opt/keycloak/data/import/identity-access-realm.json:ro
+      - keycloak_data:/opt/keycloak/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c \"{ printf 'HEAD /health/ready HTTP/1.0\\r\\n\\r\\n' >&0; grep 'HTTP/1.0 200'; } 0<>/dev/tcp/localhost/9000\""]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 45s
+    restart: unless-stopped
+
+  app:
+    build: .
+    environment:
+      APP_SECRET: ${APP_SECRET:?Falta APP_SECRET}
+      APP_DB: /srv/data/lab.sqlite
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8000}
+      SCIM_TOKEN: ${SCIM_TOKEN:?Falta SCIM_TOKEN}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-identity-access-app}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?Falta OIDC_CLIENT_SECRET}
+      OIDC_METADATA_URL: ${OIDC_METADATA_URL:-http://127.0.0.1:8000/oidc/metadata}
+      OIDC_INTERNAL_METADATA_URL: ${OIDC_INTERNAL_METADATA_URL:-http://keycloak:8080/realms/identity-access/.well-known/openid-configuration}
+      OIDC_INTERNAL_BASE_URL: ${OIDC_INTERNAL_BASE_URL:-http://keycloak:8080/realms/identity-access/protocol/openid-connect}
+      AUTHLIB_INSECURE_TRANSPORT: "1"
+      DEMO_PASSWORD_ENGINEER: ${DEMO_PASSWORD_ENGINEER:?Falta DEMO_PASSWORD_ENGINEER}
+      DEMO_PASSWORD_AUDITOR: ${DEMO_PASSWORD_AUDITOR:?Falta DEMO_PASSWORD_AUDITOR}
+      DEMO_PASSWORD_ADMIN: ${DEMO_PASSWORD_ADMIN:?Falta DEMO_PASSWORD_ADMIN}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - app_data:/srv/data
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  app_data:
+  keycloak_data:
