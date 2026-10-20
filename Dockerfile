@@ -1,4 +1,4 @@
-FROM python:3.12.11-slim-bookworm
+FROM python:3.12.15-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -12,3 +12,4 @@ RUN mkdir -p /srv/data && chown -R appuser:appuser /srv
 USER appuser
 EXPOSE 8000
 CMD ["sh", "-c", "python -m app.seed && exec gunicorn --bind 0.0.0.0:8000 --workers 2 --access-logfile - app.wsgi:app"]
+
