@@ -22,7 +22,7 @@ El modo Compose de demo está enlazado a localhost y no publica una URL HTTPS. N
    - `OIDC_METADATA_URL=https://<tenant>/.well-known/openid-configuration`
    - `OIDC_CLIENT_ID` y `OIDC_CLIENT_SECRET` con valores del tenant
 
-5. Para usar metadata externa, deja vacías `OIDC_INTERNAL_METADATA_URL` y `OIDC_INTERNAL_BASE_URL` y retira `AUTHLIB_INSECURE_TRANSPORT` de la configuración. Conserva el proxy reverso TLS y define correctamente los encabezados reenviados antes de confiar en HTTPS externo.
+5. El Compose incluido está diseñado para Keycloak local: establece las variables `OIDC_INTERNAL_*` y habilita `AUTHLIB_INSECURE_TRANSPORT` para HTTP de laboratorio. Para OneLogin, prepara una configuración de despliegue separada que no incluya esas variables, usa el `OIDC_METADATA_URL` externo y sirve la aplicación detrás de un proxy TLS confiable. No intentes cambiar a OneLogin editando solo el `.env` del Compose local.
 6. Aprovisiona primero los usuarios por SCIM con roles permitidos; luego prueba OIDC con un usuario de laboratorio.
 
 ## Limitación SCIM que debes verificar antes de integrar
@@ -30,3 +30,4 @@ El modo Compose de demo está enlazado a localhost y no publica una URL HTTPS. N
 El perfil de este MVP es deliberadamente reducido. En particular, el token compartido y el esquema `title` de rol son decisiones de laboratorio. Verifica en el conector OneLogin los métodos, campos, paginación y operación de suspensión/desactivación que enviará. Ejecuta una prueba de alta, cambio de rol, desactivación y sesión existente, y conserva solo evidencia ficticia.
 
 Si el conector requiere una función que no está implementada, no la declares soportada: amplía y prueba el perfil en una rama separada antes de usarla.
+
