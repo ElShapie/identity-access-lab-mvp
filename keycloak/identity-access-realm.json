@@ -58,6 +58,9 @@
           "value": "${DEMO_PASSWORD_ENGINEER}",
           "temporary": false
         }
+      ],
+      "requiredActions": [
+        "CONFIGURE_TOTP"
       ]
     },
     {
@@ -78,6 +81,9 @@
           "value": "${DEMO_PASSWORD_AUDITOR}",
           "temporary": false
         }
+      ],
+      "requiredActions": [
+        "CONFIGURE_TOTP"
       ]
     },
     {
@@ -98,6 +104,9 @@
           "value": "${DEMO_PASSWORD_ADMIN}",
           "temporary": false
         }
+      ],
+      "requiredActions": [
+        "CONFIGURE_TOTP"
       ]
     },
     {
@@ -121,6 +130,9 @@
           "value": "${DEMO_PASSWORD_RRHH}",
           "temporary": false
         }
+      ],
+      "requiredActions": [
+        "CONFIGURE_TOTP"
       ]
     },
     {
@@ -144,6 +156,9 @@
           "value": "${DEMO_PASSWORD_TI}",
           "temporary": false
         }
+      ],
+      "requiredActions": [
+        "CONFIGURE_TOTP"
       ]
     },
     {
@@ -167,6 +182,9 @@
           "value": "${DEMO_PASSWORD_IAM}",
           "temporary": false
         }
+      ],
+      "requiredActions": [
+        "CONFIGURE_TOTP"
       ]
     },
     {
@@ -190,6 +208,9 @@
           "value": "${DEMO_PASSWORD_SOC_AUDITORIA}",
           "temporary": false
         }
+      ],
+      "requiredActions": [
+        "CONFIGURE_TOTP"
       ]
     },
     {
@@ -213,7 +234,16 @@
           "value": "${DEMO_PASSWORD_SEGURIDAD_FISICA}",
           "temporary": false
         }
+      ],
+      "requiredActions": [
+        "CONFIGURE_TOTP"
       ]
     }
-  ]
+  ],
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyDigits": 6,
+  "otpPolicyPeriod": 30,
+  "otpPolicyLookAheadWindow": 1,
+  "otpPolicyCodeReusable": false
 }
