@@ -89,6 +89,12 @@ En el inicio de la app, pulsa **Iniciar sesión**. Keycloak muestra la pantalla 
 
 Las contraseñas iniciales están en `.env.example`. Cámbialas antes de una demostración compartida. Las cuentas son ficticias. Los roles de este MVP son globales; no limitan permisos por área. Keycloak solo importa las cuentas la primera vez que se crea su volumen.
 
+### Configurar TOTP en el primer acceso
+
+Después de ingresar la contraseña de cualquier cuenta local, Keycloak obliga a configurar un autenticador TOTP. Escanea el QR con una app compatible y escribe el código de seis dígitos para confirmar. En los siguientes inicios se solicitará un nuevo código de la app. Mantén sincronizados el reloj del servidor y del teléfono.
+
+Esta política se aplica a Keycloak local; la conexión opcional con OneLogin necesita MFA configurado por separado en ese proveedor. Si se pierde el autenticador, un administrador debe restablecer el OTP de la cuenta en Keycloak. El realm actualizado se importa solo al crear el volumen: reiniciar el laboratorio con `docker compose down -v` elimina las cuentas y eventos locales.
+
 La página de usuarios (`/admin/usuarios`) sirve para que un administrador confirme los roles locales. No permite modificar usuarios directamente; las modificaciones del ejercicio pasan por SCIM.
 
 ## 6. Probar SCIM y una baja durante una sesión abierta

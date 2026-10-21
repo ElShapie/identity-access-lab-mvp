@@ -60,6 +60,12 @@ La pantalla **Usuarios** muestra el directorio y los roles con el estilo del das
 
 La app ofrece una matriz pequeña: `admin`, `mantenimiento`, `auditor`, `consulta` y `sin_acceso`. Consulta el detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
+## MFA con TOTP
+
+El realm local exige configurar TOTP para todas las cuentas de demostración. En el primer acceso, después de la contraseña, Keycloak muestra un QR para una aplicación autenticadora; al confirmar el código, los siguientes inicios pedirán contraseña y código temporal. La política usa códigos de 6 dígitos con una ventana de 30 segundos.
+
+Esta exigencia está configurada en el Keycloak local. Si conectas OneLogin, activa MFA/TOTP también en la política de ese proveedor; la configuración del realm local no modifica OneLogin. Si se pierde el dispositivo autenticador, un administrador tendrá que restablecer la credencial TOTP en Keycloak.
+
 Para las extensiones consulta [`docs/MODULOS_OPCIONALES.md`](docs/MODULOS_OPCIONALES.md). No son necesarias para iniciar el MVP.
 
 ## Comandos útiles
