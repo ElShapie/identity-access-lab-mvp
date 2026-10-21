@@ -128,22 +128,22 @@ def create_app():
     @app.get("/consulta")
     @require("consulta")
     def consultation():
-        return "<h1>Consulta permitida</h1><a href='/'>Inicio</a>"
+        return render_template("dashboard.html", title="Consulta", page="consultation", user=store.get(session["uid"]), users=[], csrf=session.get("csrf"))
 
     @app.post("/mantenimiento")
     @require("mantenimiento")
     def maintenance():
-        return "<h1>Mantenimiento permitido</h1><a href='/'>Inicio</a>"
+        return render_template("dashboard.html", title="Mantenimiento", page="maintenance", user=store.get(session["uid"]), users=[], csrf=session.get("csrf"))
 
     @app.post("/admin")
     @require("admin")
     def administration():
-        return "<h1>Administración permitida</h1><a href='/'>Inicio</a>"
+        return render_template("dashboard.html", title="Administración", page="administration", user=store.get(session["uid"]), users=[], csrf=session.get("csrf"))
 
     @app.get("/registros")
     @require("registros")
     def records():
-        return jsonify(store.events())
+        return render_template("dashboard.html", title="Bitácora", page="events", user=store.get(session["uid"]), users=[], events=store.events(), csrf=session.get("csrf"))
 
     @app.get("/admin/usuarios")
     @require("admin")
