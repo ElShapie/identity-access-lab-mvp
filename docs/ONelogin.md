@@ -11,6 +11,10 @@ Esta guía describe la adaptación; el Compose predeterminado usa Keycloak local
 
 El modo Compose de demo está enlazado a localhost y no publica una URL HTTPS. No basta con cambiar `APP_BASE_URL` para usarlo desde OneLogin; hace falta un proxy HTTPS y configurar el callback público.
 
+## MFA/TOTP del proveedor
+
+La exigencia TOTP configurada en `keycloak/identity-access-realm.json` solo protege el realm local de demostración. No se transfiere a OneLogin al cambiar el proveedor OIDC. Para el ejercicio OneLogin, habilita una política MFA/TOTP en el tenant autorizado y prueba el flujo con una cuenta no productiva; no des por protegida la aplicación por la configuración local de Keycloak.
+
 ## Configuración OIDC de la app
 
 1. En OneLogin registra una aplicación OIDC de tipo servidor con Authorization Code.
