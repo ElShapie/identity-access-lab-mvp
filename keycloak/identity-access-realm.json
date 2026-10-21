@@ -15,8 +15,12 @@
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
-      "redirectUris": ["http://localhost:8000/auth/callback"],
-      "webOrigins": ["http://localhost:8000"],
+      "redirectUris": [
+        "http://localhost:8000/auth/callback"
+      ],
+      "webOrigins": [
+        "http://localhost:8000"
+      ],
       "protocolMappers": [
         {
           "name": "lab_role",
@@ -43,8 +47,18 @@
       "enabled": true,
       "firstName": "LAB",
       "lastName": "INGENIERO",
-      "attributes": {"lab_role": ["mantenimiento"]},
-      "credentials": [{"type": "password", "value": "${DEMO_PASSWORD_ENGINEER}", "temporary": false}]
+      "attributes": {
+        "lab_role": [
+          "mantenimiento"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PASSWORD_ENGINEER}",
+          "temporary": false
+        }
+      ]
     },
     {
       "username": "auditor@example.test",
@@ -53,8 +67,18 @@
       "enabled": true,
       "firstName": "LAB",
       "lastName": "AUDITOR",
-      "attributes": {"lab_role": ["auditor"]},
-      "credentials": [{"type": "password", "value": "${DEMO_PASSWORD_AUDITOR}", "temporary": false}]
+      "attributes": {
+        "lab_role": [
+          "auditor"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PASSWORD_AUDITOR}",
+          "temporary": false
+        }
+      ]
     },
     {
       "username": "admin@example.test",
@@ -63,8 +87,133 @@
       "enabled": true,
       "firstName": "LAB",
       "lastName": "ADMIN",
-      "attributes": {"lab_role": ["admin"]},
-      "credentials": [{"type": "password", "value": "${DEMO_PASSWORD_ADMIN}", "temporary": false}]
+      "attributes": {
+        "lab_role": [
+          "admin"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PASSWORD_ADMIN}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "rrhh@example.test",
+      "email": "rrhh@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Encargado",
+      "lastName": "RRHH",
+      "attributes": {
+        "lab_role": [
+          "consulta"
+        ],
+        "department": [
+          "RRHH"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PASSWORD_RRHH}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "ti@example.test",
+      "email": "ti@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Encargado",
+      "lastName": "TI",
+      "attributes": {
+        "lab_role": [
+          "mantenimiento"
+        ],
+        "department": [
+          "TI"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PASSWORD_TI}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "iam@example.test",
+      "email": "iam@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Encargado",
+      "lastName": "IAM",
+      "attributes": {
+        "lab_role": [
+          "admin"
+        ],
+        "department": [
+          "IAM"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PASSWORD_IAM}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "soc-auditoria@example.test",
+      "email": "soc-auditoria@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Encargado",
+      "lastName": "SOC / Auditoría",
+      "attributes": {
+        "lab_role": [
+          "auditor"
+        ],
+        "department": [
+          "SOC / Auditoría"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PASSWORD_SOC_AUDITORIA}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "seguridad-fisica@example.test",
+      "email": "seguridad-fisica@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Encargado",
+      "lastName": "Seguridad Física",
+      "attributes": {
+        "lab_role": [
+          "consulta"
+        ],
+        "department": [
+          "Seguridad Física"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PASSWORD_SEGURIDAD_FISICA}",
+          "temporary": false
+        }
+      ]
     }
   ]
 }
