@@ -8,22 +8,11 @@ from functools import wraps
 
 import requests
 from authlib.integrations.flask_client import OAuth
-from flask import Flask, abort, jsonify, redirect, render_template_string, request, session
+from flask import Flask, abort, jsonify, redirect, render_template, request, session
 
 from app.store import Store
 
-HOME = """<!doctype html><meta charset=utf-8><title>Identity Access Lab</title>
-<h1>Identity Access Lab</h1>
-<p>Sesión: {{ user.userName }} — rol: {{ user.title }} — cuenta: {{ 'activa' if user.active else 'inactiva' }}</p>
-<p><a href=/consulta>Consulta</a> · <a href=/registros>Registros</a> · <a href=/admin/usuarios>Administrar usuarios</a></p>
-<form action=/mantenimiento method=post><input type=hidden name=csrf value="{{ csrf }}"><button>Mantenimiento</button></form>
-<form action=/admin method=post><input type=hidden name=csrf value="{{ csrf }}"><button>Administración de prueba</button></form>
-<form action=/logout method=post><input type=hidden name=csrf value="{{ csrf }}"><button>Cerrar sesión</button></form>"""
 
-USERS = """<!doctype html><meta charset=utf-8><title>Usuarios</title><h1>Usuarios del laboratorio</h1>
-<p><a href=/>Inicio</a></p><table border=1 cellpadding=6><tr><th>Correo</th><th>Rol</th><th>Activo</th></tr>
-{% for u in users %}<tr><td>{{ u.userName }}</td><td>{{ u.title }}</td><td>{{ u.active }}</td></tr>{% endfor %}</table>
-<h2>Crear o actualizar por SCIM</h2><p>Utiliza el endpoint SCIM y token documentados; esta pantalla es solo consulta.</p>"""
 
 
 def create_app():
@@ -107,9 +96,9 @@ def create_app():
             session.clear()
             user = None
         if not user:
-            return "<h1>Identity Access Lab</h1><p><a href='/login'>Iniciar sesión</a></p>"
+            return render_template("dashboard.html", title="Acceso", page="login", user=None, users=[])
         session.setdefault("csrf", secrets.token_urlsafe(32))
-        return render_template_string(HOME, user=user, csrf=session["csrf"])
+        return render_template("dashboard.html", title="Resumen", page="home", user=user, users=[], csrf=session["csrf"])
 
     @app.get("/login")
     def login():
@@ -159,7 +148,7 @@ def create_app():
     @app.get("/admin/usuarios")
     @require("admin")
     def admin_users():
-        return render_template_string(USERS, users=store.all())
+        return render_template("dashboard.html", title="Usuarios", page="users", user=store.get(session["uid"]), users=store.all(), csrf=session["csrf"])
 
     @app.post("/logout")
     def logout():
