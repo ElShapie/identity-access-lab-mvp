@@ -74,6 +74,17 @@
         {% endfor %}</tbody></table></div>
       </section>
       <aside class="info-banner"><span class="info-mark">i</span><span><strong>Roles globales en este MVP</strong><small>Los permisos actuales se asignan por rol en toda la app; todavía no están limitados por departamento.</small></span></aside>
+      {% elif page == 'events' %}
+      <section class="welcome compact"><div><p class="eyebrow">TRAZABILIDAD</p><h1>Bitácora de eventos</h1><p class="muted">Últimos eventos registrados en este laboratorio local.</p></div><div class="welcome-icon" aria-hidden="true">◷</div></section>
+      <section class="table-card">
+        <div class="table-heading"><div><p class="eyebrow">AUDITORÍA</p><h2>Actividad reciente</h2></div><span class="table-count">{{ events|length }} eventos</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Fecha UTC</th><th>Identidad</th><th>Acción</th><th>Resultado</th></tr></thead><tbody>
+        {% for event in events %}<tr><td data-label="Fecha UTC">{{ event.time }}</td><td data-label="Identidad" class="email-cell">{{ event.user }}</td><td data-label="Acción">{{ event.action }}</td><td data-label="Resultado"><span class="status-pill {{ 'success' if event.result in ('OK', 'PERMITIDO') else 'danger' }}">{{ event.result }}</span></td></tr>{% else %}<tr><td class="empty-state" colspan="4">Aún no hay eventos registrados.</td></tr>{% endfor %}</tbody></table></div>
+      </section>
+      {% elif page == 'consultation' or page == 'maintenance' or page == 'administration' %}
+      <section class="welcome compact"><div><p class="eyebrow">CONTROL DE ACCESO</p><h1>{{ title }} permitida</h1><p class="muted">El servidor autorizó esta acción con los permisos de tu perfil.</p></div><div class="welcome-icon" aria-hidden="true">✓</div></section>
+      <section class="summary-grid"><article class="summary-card"><span class="card-label">Identidad</span><strong>{{ user.displayName or user.userName }}</strong><small>{{ user.userName }}</small></article><article class="summary-card"><span class="card-label">Área</span><strong>{{ user.department or 'Laboratorio' }}</strong><small>Perfil local</small></article><article class="summary-card"><span class="card-label">Rol validado</span><strong>{{ user.title }}</strong><small>Autorización verificada en servidor</small></article></section>
+      <a class="primary-button back-button" href="/">Volver al resumen <span aria-hidden="true">→</span></a>
       {% endif %}
     </div>
   </main>
