@@ -76,13 +76,18 @@ Resultado esperado: `{"status":"ok"}`. Abre después <http://localhost:8000>.
 
 En el inicio de la app, pulsa **Iniciar sesión**. Keycloak muestra la pantalla local del realm. Usa una de estas cuentas, cuya contraseña está en `.env`:
 
-| Correo | Rol | Pruebas esperadas |
-|---|---|---|
-| `ingeniero@example.test` | `mantenimiento` | Consulta y mantenimiento permitidos; administración denegada |
-| `auditor@example.test` | `auditor` | Consulta y registros permitidos; mantenimiento denegado |
-| `admin@example.test` | `admin` | Consulta, mantenimiento, administración y registros permitidos |
+| Correo | Área | Rol | Pruebas esperadas |
+|---|---|---|---|
+| `ingeniero@example.test` | Laboratorio | `mantenimiento` | Consulta y mantenimiento permitidos; administración denegada |
+| `auditor@example.test` | Laboratorio | `auditor` | Consulta y registros permitidos; mantenimiento denegado |
+| `admin@example.test` | Laboratorio | `admin` | Consulta, mantenimiento, administración y registros permitidos |
+| `rrhh@example.test` | RRHH | `consulta` | Solo consulta |
+| `ti@example.test` | TI | `mantenimiento` | Consulta y mantenimiento |
+| `iam@example.test` | IAM | `admin` | Administración y registros |
+| `soc-auditoria@example.test` | SOC / Auditoría | `auditor` | Consulta y registros |
+| `seguridad-fisica@example.test` | Seguridad Física | `consulta` | Solo consulta |
 
-Las contraseñas iniciales están en `.env.example`. Cámbialas antes de una demostración compartida. Las cuentas son ficticias.
+Las contraseñas iniciales están en `.env.example`. Cámbialas antes de una demostración compartida. Las cuentas son ficticias. Los roles de este MVP son globales; no limitan permisos por área. Keycloak solo importa las cuentas la primera vez que se crea su volumen.
 
 La página de usuarios (`/admin/usuarios`) sirve para que un administrador confirme los roles locales. No permite modificar usuarios directamente; las modificaciones del ejercicio pasan por SCIM.
 
