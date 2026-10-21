@@ -36,6 +36,20 @@ El inicio de Keycloak puede tardar un minuto la primera vez. La guía completa, 
 
 Los comandos reproducibles están en la guía de instalación. El rol y el estado que autorizan acciones viven en la base local de la aplicación; SCIM es la vía documentada para sincronizar esos cambios.
 
+### Encargados de área de demostración
+
+El realm local incluye cuentas ficticias para **RRHH**, **TI**, **IAM**, **SOC / Auditoría** y **Seguridad Física**. Sus correos y contraseñas se encuentran en `.env.example`; los roles existentes se aplican a toda la aplicación y todavía no tienen alcance por área.
+
+| Área | Correo | Rol |
+|---|---|---|
+| RRHH | `rrhh@example.test` | `consulta` |
+| TI | `ti@example.test` | `mantenimiento` |
+| IAM | `iam@example.test` | `admin` |
+| SOC / Auditoría | `soc-auditoria@example.test` | `auditor` |
+| Seguridad Física | `seguridad-fisica@example.test` | `consulta` |
+
+La pantalla **Usuarios** muestra el directorio y los roles con el estilo del dashboard DPO. Keycloak importa el realm al crear su volumen por primera vez; un volumen ya inicializado no recibe usuarios nuevos automáticamente. Para reiniciar el laboratorio desde cero y volver a importar las cuentas, `docker compose down -v` elimina las bases locales y las sesiones guardadas.
+
 ## Componentes
 
 - **Keycloak 26.7.3:** proveedor OIDC local; importa un realm de demostración al iniciar por primera vez.
