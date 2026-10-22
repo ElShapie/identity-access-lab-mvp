@@ -2,6 +2,28 @@
 
 El Compose principal solo levanta Keycloak y la aplicación. Los siguientes módulos se conservan separados para que se puedan preparar después del recorrido de identidad digital.
 
+## Badge NFC para iniciar sesión
+
+Archivos: [`tools/nfc-bridge.ps1`](../tools/nfc-bridge.ps1), [`app/nfc_cli.py`](../app/nfc_cli.py) y [`docs/NFC_LOGIN.md`](NFC_LOGIN.md).
+
+Permite abrir sesión acercando una tarjeta al lector USB en lugar de escribir la contraseña: el puente del host envía el UID leído a la app, la app lo contrasta con su lista blanca y abre sesión con las credenciales guardadas de ese usuario.
+
+### Requisitos
+
+- Lector NFC USB (probado con ACS ACR122U) y tarjeta ISO14443-A de prueba.
+- Windows con PowerShell 5.1 o superior en el host del lector.
+- `NFC_ENABLED=true` y `NFC_BRIDGE_TOKEN` en el `.env` de la app.
+
+### Preparación
+
+1. Copia `.env.example` como `.env`, activa `NFC_ENABLED=true` y define un `NFC_BRIDGE_TOKEN` de 32 caracteres o más.
+2. Lee el UID de la tarjeta con `powershell -ExecutionPolicy Bypass -File .\tools\nfc-bridge.ps1 -PrintUid`.
+3. Registra la tarjeta con `docker compose exec app python -m app.nfc_cli --uid <UID> --user admin@example.test`.
+4. Arranca el puente con `powershell -ExecutionPolicy Bypass -File .\tools\nfc-bridge.ps1 -Token "<tu-token>"` y deja la terminal abierta.
+5. Abre <http://localhost:8000> sin iniciar sesión y acerca la tarjeta: la sesión se abre sola.
+
+La guía completa, con comprobaciones y límites de seguridad, está en [`docs/NFC_LOGIN.md`](NFC_LOGIN.md). El módulo guarda las credenciales de las cuentas ficticias en el `.env` del host y solo sirve para el laboratorio local enlazado a `127.0.0.1`.
+
 ## RFID
 
 Archivos: [`modules/rfid/control_acceso.ino`](../modules/rfid/control_acceso.ino) y [`modules/rfid/registrar_tarjetas.py`](../modules/rfid/registrar_tarjetas.py).

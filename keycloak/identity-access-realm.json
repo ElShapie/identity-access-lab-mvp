@@ -13,7 +13,7 @@
       "publicClient": false,
       "secret": "${OIDC_CLIENT_SECRET}",
       "standardFlowEnabled": true,
-      "directAccessGrantsEnabled": false,
+      "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
       "redirectUris": [
         "http://localhost:8000/auth/callback"

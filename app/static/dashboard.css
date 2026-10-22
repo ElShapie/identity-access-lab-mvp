@@ -115,6 +115,25 @@ tbody tr:last-child td { border-bottom: 0; }
 .primary-button { display: flex; min-height: 46px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; border: 1px solid #4869ca; border-radius: 8px; color: #fff; background: var(--cobalt); font-size: 12px; font-weight: 550; }
 .primary-button:hover { background: #3f63c9; }
 .login-foot { display: flex; align-items: center; gap: 8px; margin-top: 22px; padding-top: 17px; border-top: 1px solid var(--border); color: var(--muted); font-size: 10px; }
+.badge-panel { display: flex; align-items: center; gap: 11px; margin-top: 16px; padding: 13px 14px; border: 1px dashed #c9d2e8; border-radius: 10px; background: #f7f9ff; }
+.badge-indicator { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--cobalt); animation: badge-pulse 1.6s ease-in-out infinite; }
+.badge-copy strong, .badge-copy small { display: block; }
+.badge-copy strong { margin-bottom: 2px; color: #33417a; font-size: 12px; font-weight: 600; }
+.badge-copy small { color: var(--muted); font-size: 11px; line-height: 1.45; }
+.badge-panel[data-state="ok"] { border-style: solid; border-color: #b9dfc8; background: #f2fbf5; }
+.badge-panel[data-state="ok"] .badge-indicator { background: #2f9c5f; animation: none; }
+.badge-panel[data-state="error"] { border-style: solid; border-color: #f0c2c6; background: #fff6f7; }
+.badge-panel[data-state="error"] .badge-indicator { background: #c3404b; animation: none; }
+@keyframes badge-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
+.nfc-form-card { margin-top: 16px; }
+.form-error { margin: 16px 22px 0; padding: 10px 12px; border: 1px solid #f0c2c6; border-radius: 8px; color: #a4202b; background: #fff5f6; font-size: 11px; }
+.nfc-form { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)) auto; align-items: end; gap: 14px; padding: 20px 22px; }
+.nfc-form label { display: grid; gap: 6px; color: var(--muted); font-size: 11px; }
+.nfc-form input, .nfc-form select { min-height: 40px; padding: 0 11px; border: 1px solid var(--border); border-radius: 8px; color: var(--ink); background: #fff; font: inherit; font-size: 12px; }
+.nfc-form .primary-button { min-height: 40px; }
+.danger-button { padding: 6px 11px; border: 1px solid #f0c2c6; border-radius: 7px; color: #a4202b; background: #fff5f6; font-size: 11px; font-weight: 550; cursor: pointer; }
+.danger-button:hover { background: #ffecee; }
+.empty-state { color: var(--muted); text-align: center; }
 :focus-visible { outline: 3px solid rgba(79,115,217,.42); outline-offset: 3px; }
 @media (max-width: 1000px) {
   :root { --sidebar-width: 218px; }
@@ -151,7 +170,9 @@ tbody tr:last-child td { border-bottom: 0; }
   .person-cell { min-width: 0; }
   .email-cell { white-space: normal; }
   .login-card { padding: 27px 23px; }
+  .nfc-form { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  .badge-indicator { animation: none !important; }
 }

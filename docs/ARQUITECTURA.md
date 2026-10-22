@@ -5,12 +5,17 @@
 ```text
 Navegador ── OIDC ──> Keycloak (contenedor local, puerto 8081)
     │                         │
+    │                         ▲
     └──── HTTP ──> Flask/Gunicorn (puerto 8000) ──> SQLite (volumen app_data)
-                                      ▲
-                       SCIM 2.0 ──────┘
+                      ▲        │
+        SCIM 2.0 ─────┘        ▲
+                              │
+Lector USB ──> puente NFC del host ──> POST /nfc/tap
 ```
 
 Los dos puertos del host se enlazan a `127.0.0.1`. El contenedor de la app usa una URL de descubrimiento OIDC local que lee metadata de Keycloak por la red privada de Compose y reescribe token, userinfo y JWKS a direcciones internas. El `issuer` y la URL de autorización permanecen en `http://localhost:8081`, que es lo que usa el navegador. Esto evita pedir al usuario que añada nombres al archivo `hosts`.
+
+El puente NFC es un componente opcional del host, no del contenedor: el lector USB no puede abrirse desde la red de Compose. El puente solo propone un UID; la app sigue siendo la autoridad que decide si esa tarjeta está habilitada. Detalle en [`NFC_LOGIN.md`](NFC_LOGIN.md).
 
 ## Flujo OIDC
 

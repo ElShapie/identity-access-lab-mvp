@@ -5,6 +5,7 @@ import secrets
 import sqlite3
 from datetime import timedelta
 from functools import wraps
+from urllib.parse import quote
 
 import requests
 from authlib.integrations.flask_client import OAuth
@@ -12,7 +13,16 @@ from flask import Flask, abort, jsonify, redirect, render_template, request, ses
 
 from app.store import Store
 
-
+DEMO_PASSWORD_VARS = {
+    "ingeniero@example.test": "DEMO_PASSWORD_ENGINEER",
+    "auditor@example.test": "DEMO_PASSWORD_AUDITOR",
+    "admin@example.test": "DEMO_PASSWORD_ADMIN",
+    "rrhh@example.test": "DEMO_PASSWORD_RRHH",
+    "ti@example.test": "DEMO_PASSWORD_TI",
+    "iam@example.test": "DEMO_PASSWORD_IAM",
+    "soc-auditoria@example.test": "DEMO_PASSWORD_SOC_AUDITORIA",
+    "seguridad-fisica@example.test": "DEMO_PASSWORD_SEGURIDAD_FISICA",
+}
 
 
 def create_app():
@@ -39,6 +49,97 @@ def create_app():
         server_metadata_url=os.environ["OIDC_METADATA_URL"],
         client_kwargs={"scope": "openid profile email"},
     )
+
+    # --- Acceso con badge NFC (opcional) ---
+    nfc_enabled = os.environ.get("NFC_ENABLED", "false").lower() in ("1", "true", "yes", "on")
+    nfc_token = os.environ.get("NFC_BRIDGE_TOKEN", "")
+    nfc_login_username = os.environ.get("NFC_LOGIN_USERNAME", "").strip().lower()
+    nfc_login_password = os.environ.get("NFC_LOGIN_PASSWORD", "")
+    nfc_tap_ttl = max(5, int(os.environ.get("NFC_TAP_TTL_SECONDS", "15")))
+    if nfc_enabled and len(nfc_token) < 32:
+        raise RuntimeError("NFC_BRIDGE_TOKEN debe tener 32 caracteres o más para habilitar el acceso NFC")
+
+    def badge_credentials(username):
+        """Devuelve (usuario, contraseña) guardados en el entorno para el titular del badge."""
+        username = str(username or "").strip().lower()
+        if not username:
+            return None
+        if username == nfc_login_username and nfc_login_password:
+            return username, nfc_login_password
+        explicit = "NFC_PASSWORD_" + re.sub(r"[^A-Z0-9]+", "_", username.upper()).strip("_")
+        if os.environ.get(explicit):
+            return username, os.environ[explicit]
+        demo_var = DEMO_PASSWORD_VARS.get(username)
+        if demo_var and os.environ.get(demo_var):
+            return username, os.environ[demo_var]
+        return None
+
+    def badge_sign_in(username):
+        """Abre sesión en Keycloak con las credenciales guardadas del usuario del badge."""
+        credentials = badge_credentials(username)
+        if not credentials:
+            return None, "No hay credenciales guardadas para " + username
+        metadata_url = os.environ.get("OIDC_INTERNAL_METADATA_URL") or os.environ["OIDC_METADATA_URL"]
+        metadata = {}
+        try:
+            metadata = requests.get(metadata_url, timeout=5).json()
+        except (requests.RequestException, ValueError):
+            metadata = {}
+        # La metadata declara los endpoints con el host publico (localhost:8081), que no
+        # resuelve dentro de la red de Compose. Se usan las direcciones internas, igual que
+        # hace el proxy /oidc/metadata.
+        internal_base = os.environ.get("OIDC_INTERNAL_BASE_URL", "").rstrip("/")
+        token_endpoint = internal_base + "/token" if internal_base else metadata.get("token_endpoint")
+        userinfo_endpoint = internal_base + "/userinfo" if internal_base else metadata.get("userinfo_endpoint")
+        if not token_endpoint:
+            return None, "El proveedor OIDC local no expone un endpoint de token"
+        try:
+            token_response = requests.post(
+                token_endpoint,
+                data={
+                    "grant_type": "password",
+                    "client_id": os.environ["OIDC_CLIENT_ID"],
+                    "client_secret": os.environ["OIDC_CLIENT_SECRET"],
+                    "username": credentials[0],
+                    "password": credentials[1],
+                    "scope": "openid profile email",
+                },
+                timeout=10,
+            )
+        except (requests.RequestException, ValueError, KeyError) as error:
+            app.logger.warning("Fallo al pedir token del badge: %s", error)
+            return None, "El proveedor OIDC local no está disponible"
+        if not token_response.ok:
+            return None, "El proveedor OIDC local rechazó el acceso del badge"
+        payload = token_response.json()
+        access_token = payload.get("access_token")
+        if not access_token:
+            return None, "El proveedor OIDC local no devolvió token"
+        identity = payload.get("userinfo") or {}
+        if not userinfo_endpoint:
+            userinfo_endpoint = metadata.get("userinfo_endpoint")
+        if userinfo_endpoint:
+            try:
+                userinfo = requests.get(userinfo_endpoint, headers={"Authorization": "Bearer " + access_token}, timeout=10)
+                if userinfo.ok:
+                    identity = userinfo.json()
+            except (requests.RequestException, ValueError):
+                identity = payload.get("userinfo") or {}
+        subject = identity.get("sub")
+        email = identity.get("email")
+        if not subject or not email:
+            return None, "El proveedor OIDC local devolvió una identidad incompleta"
+        user = store.by_name(email)
+        if not user or not user.get("active"):
+            return None, "El usuario local no está disponible"
+        if not store.bind_identity(user["id"], str(subject)):
+            return None, "La identidad ya está vinculada a otra cuenta"
+        session.clear()
+        session["uid"] = user["id"]
+        session["csrf"] = secrets.token_urlsafe(32)
+        session.permanent = True
+        store.event(user["id"], "LOGIN_NFC", "PERMITIDO")
+        return user, None
 
     def scim_auth(fn):
         @wraps(fn)
@@ -96,9 +197,10 @@ def create_app():
             session.clear()
             user = None
         if not user:
-            return render_template("dashboard.html", title="Acceso", page="login", user=None, users=[])
+            session.setdefault("csrf", secrets.token_urlsafe(32))
+            return render_template("dashboard.html", title="Acceso", page="login", user=None, users=[], csrf=session["csrf"], nfc_enabled=nfc_enabled)
         session.setdefault("csrf", secrets.token_urlsafe(32))
-        return render_template("dashboard.html", title="Resumen", page="home", user=user, users=[], csrf=session["csrf"])
+        return render_template("dashboard.html", title="Resumen", page="home", user=user, users=[], csrf=session["csrf"], nfc_enabled=nfc_enabled)
 
     @app.get("/login")
     def login():
@@ -145,6 +247,79 @@ def create_app():
     def records():
         return render_template("dashboard.html", title="Bitácora", page="events", user=store.get(session["uid"]), users=[], events=store.events(), csrf=session.get("csrf"))
 
+    @app.post("/nfc/tap")
+    def nfc_tap():
+        """El puente NFC del host envía el UID leído; la app decide si la tarjeta está autorizada."""
+        if not nfc_enabled:
+            return jsonify(error="El acceso NFC está deshabilitado"), 404
+        if not hmac.compare_digest(request.headers.get("Authorization", ""), "Bearer " + nfc_token):
+            return jsonify(error="No autorizado"), 401
+        payload = request.get_json(silent=True) or {}
+        uid = str(payload.get("uid", ""))
+        card = store.card(uid)
+        if not card:
+            store.event("nfc:" + (uid or "?"), "NFC_TAP", "DENEGADO")
+            return jsonify(error="Tarjeta no registrada"), 403
+        user = store.by_name(card["username"])
+        if not user or not user.get("active"):
+            store.event("nfc:" + card["uid"], "NFC_TAP", "DENEGADO")
+            return jsonify(error="Usuario no disponible"), 403
+        store.record_tap(card["uid"], card["username"], str(payload.get("source", "bridge")))
+        return jsonify(accepted=True, user=card["username"])
+
+    @app.post("/nfc/poll")
+    def nfc_poll():
+        """El navegador pregunta si hay un toque pendiente y, si lo hay, abre sesión con el badge."""
+        if not nfc_enabled:
+            return jsonify(login=False)
+        payload = request.get_json(silent=True) or {}
+        csrf = str(payload.get("csrf", ""))
+        if not hmac.compare_digest(csrf.encode("utf-8"), str(session.get("csrf", "")).encode("utf-8")):
+            return jsonify(error="Token CSRF inválido"), 400
+        tap = store.claim_tap(nfc_tap_ttl)
+        if not tap:
+            return jsonify(login=False)
+        if session.get("uid"):
+            # Ya hay una sesion abierta: el toque se descarta en lugar de guardarse, para
+            # que no reabra el acceso por si solo cuando el usuario cierre la sesion.
+            store.event("nfc:" + tap["uid"], "NFC_TAP_DESCARTADO", "OK")
+            return jsonify(login=False)
+        user, error = badge_sign_in(tap["username"])
+        if not user:
+            store.event("nfc:" + tap["uid"], "LOGIN_NFC", "DENEGADO")
+            return jsonify(login=False, error=error), 401
+        return jsonify(login=True, user=user["userName"])
+
+    @app.get("/nfc")
+    @require("admin")
+    def nfc_admin():
+        return render_template(
+            "dashboard.html",
+            title="Badge NFC",
+            page="nfc",
+            user=store.get(session["uid"]),
+            users=store.all(),
+            cards=store.cards(),
+            csrf=session.get("csrf"),
+            nfc_enabled=nfc_enabled,
+            nfc_ttl=nfc_tap_ttl,
+        )
+
+    @app.post("/nfc/tarjetas")
+    @require("admin")
+    def nfc_card_create():
+        try:
+            store.register_card(request.form.get("uid", ""), request.form.get("username", ""), request.form.get("label", ""))
+        except ValueError as error:
+            return redirect("/nfc?error=" + quote(str(error)))
+        return redirect("/nfc")
+
+    @app.post("/nfc/tarjetas/eliminar")
+    @require("admin")
+    def nfc_card_delete():
+        store.remove_card(request.form.get("uid", ""))
+        return redirect("/nfc")
+
     @app.get("/admin/usuarios")
     @require("admin")
     def admin_users():
@@ -155,6 +330,10 @@ def create_app():
         if not session.get("uid") or not hmac.compare_digest(request.form.get("csrf", ""), session.get("csrf", "")):
             abort(400)
         store.event(session["uid"], "LOGOUT_APP", "OK")
+        # Los toques leidos antes del cierre se descartan: si no quedaran guardados, la
+        # pantalla de acceso los consumiria al reiniciar el polling y volveria a abrir
+        # sesion sin que el usuario pase la tarjeta de nuevo.
+        store.clear_taps()
         session.clear()
         return redirect("/")
 

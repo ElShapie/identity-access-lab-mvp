@@ -21,6 +21,7 @@
       <a class="nav-item {% if page == 'consultation' %}active{% endif %}" href="/consulta"><span class="nav-icon">◫</span><span>Consulta</span></a>
       <a class="nav-item" href="/registros"><span class="nav-icon">◷</span><span>Bitácora</span></a>
       <a class="nav-item" href="/admin/usuarios"><span class="nav-icon">♙</span><span>Usuarios</span></a>
+      {% if user.title == 'admin' %}<a class="nav-item {% if page == 'nfc' %}active{% endif %}" href="/nfc"><span class="nav-icon">▤</span><span>Badge NFC</span></a>{% endif %}
     </nav>
     <div class="sidebar-spacer"></div>
     <div class="sidebar-note"><span class="status-dot"></span> Entorno local de demostración</div>
@@ -81,6 +82,27 @@
         <div class="table-scroll"><table><thead><tr><th>Fecha UTC</th><th>Identidad</th><th>Acción</th><th>Resultado</th></tr></thead><tbody>
         {% for event in events %}<tr><td data-label="Fecha UTC">{{ event.time }}</td><td data-label="Identidad" class="email-cell">{{ event.user }}</td><td data-label="Acción">{{ event.action }}</td><td data-label="Resultado"><span class="status-pill {{ 'success' if event.result in ('OK', 'PERMITIDO') else 'danger' }}">{{ event.result }}</span></td></tr>{% else %}<tr><td class="empty-state" colspan="4">Aún no hay eventos registrados.</td></tr>{% endfor %}</tbody></table></div>
       </section>
+      {% elif page == 'nfc' %}
+      <section class="welcome compact"><div><p class="eyebrow">ACCESO CON TARJETA</p><h1>Badge NFC</h1><p class="muted">Tarjetas habilitadas para abrir sesión en este laboratorio sin escribir la contraseña.</p></div><div class="welcome-icon" aria-hidden="true">▤</div></section>
+      <section class="summary-grid"><article class="summary-card"><span class="card-label">Tarjetas registradas</span><strong>{{ cards|length }}</strong><small>Lista blanca local</small></article><article class="summary-card"><span class="card-label">Estado del módulo</span><strong><span class="status-pill {{ 'success' if nfc_enabled else 'danger' }}">{{ 'Activo' if nfc_enabled else 'Inactivo' }}</span></strong><small>Puente NFC en el host</small></article><article class="summary-card"><span class="card-label">Ventana de toque</span><strong>{{ nfc_ttl }} s</strong><small>Tiempo máximo para iniciar sesión</small></article></section>
+      <section class="table-card">
+        <div class="table-heading"><div><p class="eyebrow">LISTA BLANCA</p><h2>Tarjetas autorizadas</h2></div><span class="table-count">{{ cards|length }} tarjetas</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Tarjeta</th><th>Usuario</th><th>Etiqueta</th><th>Alta</th><th>Acciones</th></tr></thead><tbody>
+        {% for card in cards %}<tr><td data-label="Tarjeta" class="email-cell">{{ card.uid }}</td><td data-label="Usuario">{{ card.username }}</td><td data-label="Etiqueta">{{ card.label or '—' }}</td><td data-label="Alta" class="email-cell">{{ card.created_at }}</td><td data-label="Acciones"><form action="/nfc/tarjetas/eliminar" method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="uid" value="{{ card.uid }}"><button class="danger-button" type="submit">Retirar</button></form></td></tr>
+        {% else %}<tr><td class="empty-state" colspan="5">Todavía no hay tarjetas registradas.</td></tr>{% endfor %}</tbody></table></div>
+      </section>
+      <section class="table-card nfc-form-card">
+        <div class="table-heading"><div><p class="eyebrow">ALTA</p><h2>Registrar una tarjeta</h2></div></div>
+        {% if request.args.get('error') %}<p class="form-error">{{ request.args.get('error') }}</p>{% endif %}
+        <form class="nfc-form" action="/nfc/tarjetas" method="post">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <label>UID de la tarjeta<input name="uid" placeholder="0FC728C9" required></label>
+          <label>Usuario del laboratorio<select name="username">{% for item in users %}<option value="{{ item.userName }}" {{ 'selected' if item.userName == 'admin@example.test' }}>{{ item.displayName or item.userName }} · {{ item.userName }}</option>{% endfor %}</select></label>
+          <label>Etiqueta<input name="label" placeholder="Tarjeta del administrador"></label>
+          <button class="primary-button" type="submit">Registrar tarjeta <span aria-hidden="true">→</span></button>
+        </form>
+      </section>
+      <aside class="info-banner"><span class="info-mark">i</span><span><strong>Cómo se valida</strong><small>El puente NFC del host envía el UID leído a la app; la app contrasta con esta lista y, si la tarjeta está registrada, abre sesión con las credenciales guardadas del usuario indicado.</small></span></aside>
       {% elif page == 'consultation' or page == 'maintenance' or page == 'administration' %}
       <section class="welcome compact"><div><p class="eyebrow">CONTROL DE ACCESO</p><h1>{{ title }} permitida</h1><p class="muted">El servidor autorizó esta acción con los permisos de tu perfil.</p></div><div class="welcome-icon" aria-hidden="true">✓</div></section>
       <section class="summary-grid"><article class="summary-card"><span class="card-label">Identidad</span><strong>{{ user.displayName or user.userName }}</strong><small>{{ user.userName }}</small></article><article class="summary-card"><span class="card-label">Área</span><strong>{{ user.department or 'Laboratorio' }}</strong><small>Perfil local</small></article><article class="summary-card"><span class="card-label">Rol validado</span><strong>{{ user.title }}</strong><small>Autorización verificada en servidor</small></article></section>
@@ -96,9 +118,47 @@
     <p class="eyebrow">ENTORNO DE PRÁCTICA</p><h1>Acceso al laboratorio</h1>
     <p class="muted">Inicia sesión para consultar tu perfil y recorrer los controles de identidad.</p>
     <a class="primary-button" href="/login">Iniciar sesión con Keycloak <span aria-hidden="true">→</span></a>
+    {% if nfc_enabled %}
+    <div class="badge-panel" id="badge-panel" data-state="idle">
+      <span class="badge-indicator" aria-hidden="true"></span>
+      <span class="badge-copy"><strong>Esperando badge NFC</strong><small id="badge-status">Acerca tu tarjeta al lector para iniciar sesión automáticamente.</small></span>
+    </div>
+    {% endif %}
     <div class="login-foot"><span class="status-dot"></span> Keycloak local · datos ficticios</div>
   </section>
 </main>
+{% endif %}
+{% if nfc_enabled and not user %}
+<script>
+(function () {
+  var panel = document.getElementById('badge-panel');
+  if (!panel) { return; }
+  var status = document.getElementById('badge-status');
+  var csrf = {{ csrf|tojson }};
+  function poll() {
+    fetch('/nfc/poll', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({csrf: csrf})
+    }).then(function (response) {
+      return response.json().catch(function () { return {}; });
+    }).then(function (data) {
+      if (data && data.login) {
+        panel.dataset.state = 'ok';
+        status.textContent = 'Tarjeta aceptada. Abriendo sesión...';
+        window.location.reload();
+        return;
+      }
+      if (data && data.error) {
+        panel.dataset.state = 'error';
+        status.textContent = data.error;
+      }
+    }).catch(function () {});
+  }
+  window.setInterval(poll, 1500);
+})();
+</script>
 {% endif %}
 </body>
 </html>

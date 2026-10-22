@@ -56,11 +56,15 @@ La pantalla **Usuarios** muestra el directorio y los roles con el estilo del das
 - **Flask + Gunicorn:** login OIDC, permisos por rol, CSRF, sesión y subconjunto SCIM 2.0.
 - **SQLite:** persistencia local de usuarios y últimos 500 eventos.
 - **Docker Compose:** red interna, volúmenes persistentes, healthchecks y puertos ligados a localhost.
-- **Módulos opcionales:** ejemplos de RFID y Frigate conservados fuera del arranque predeterminado; ejercicios de Microsoft 365 requieren un tenant autorizado.
+- **Módulos opcionales:** ejemplos de RFID y Frigate conservados fuera del arranque predeterminado; un módulo de badge NFC para iniciar sesión acercando una tarjeta y ejercicios de Microsoft 365 requieren un tenant autorizado.
 
 La app ofrece una matriz pequeña: `admin`, `mantenimiento`, `auditor`, `consulta` y `sin_acceso`. Consulta el detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 Para las extensiones consulta [`docs/MODULOS_OPCIONALES.md`](docs/MODULOS_OPCIONALES.md). No son necesarias para iniciar el MVP.
+
+### Inicio de sesión con badge NFC (opcional)
+
+Con `NFC_ENABLED=true` y el puente [`tools/nfc-bridge.ps1`](tools/nfc-bridge.ps1) corriendo en el host del lector USB, acercar una tarjetaNFC registrada abre sesión en la app sin escribir la contraseña. La app contrasta el UID con su lista blanca y usa las credenciales del usuario guardadas en el `.env`. La guía está en [`docs/NFC_LOGIN.md`](docs/NFC_LOGIN.md).
 
 ## Comandos útiles
 
