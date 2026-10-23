@@ -1,0 +1,24 @@
+name: identity_access_mobile
+description: "Aplicación móvil Flutter para monitoreo de cámaras Frigate NVR y relevo de turnos SOC."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  intl: ^0.19.0
+  # Opcional para reproducción RTSP de ultrabaja latencia:
+  # media_kit: ^1.1.10
+  # media_kit_video: ^1.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

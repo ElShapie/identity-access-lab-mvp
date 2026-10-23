@@ -175,7 +175,7 @@
       "emailVerified": true,
       "enabled": true,
       "firstName": "Encargado",
-      "lastName": "SOC / Auditoría",
+      "lastName": "SOC Auditoria",
       "attributes": {
         "lab_role": [
           "auditor"

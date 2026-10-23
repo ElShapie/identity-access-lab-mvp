@@ -1,0 +1,104 @@
+# ==============================================================================
+# Configuración Frigate NVR - Identity Access Lab
+# ==============================================================================
+# Centralizado con Keycloak, Flask Web App y Aplicación Móvil Flutter.
+# ==============================================================================
+
+mqtt:
+  enabled: false
+
+auth:
+  enabled: false # Permite acceso ágil a la API y streams desde la app móvil Flutter y Web
+
+# Grabación continua y visualización fluida
+detect:
+  enabled: false
+
+record:
+  enabled: true
+  retain:
+    days: 3
+    mode: motion # Solo guarda segmentos con movimiento: evita llenar el disco del host
+
+snapshots:
+  enabled: true
+  retain:
+    default: 3
+
+birdseye:
+  enabled: true
+  mode: continuous
+
+go2rtc:
+  streams:
+    # --------------------------------------------------------------------------
+    # 1. CÁMARA DEMO / STREAM EN VIVO (Zócalo CDMX / HLS Test)
+    # --------------------------------------------------------------------------
+    # Activa de inmediato sin necesidad de hardware físico.
+    # Emite señal HLS 24/7 procesada por ffmpeg para visualización y prueba de NVR.
+    # Si tienes 'yt-dlp' instalado en el host o contenedor, puedes usar:
+    #   - "exec:yt-dlp -g https://www.youtube.com/@webcamsdemexico/live"
+    zocalo_cdmx:
+      - "ffmpeg:https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8#video=copy#audio=aac"
+
+    # --------------------------------------------------------------------------
+    # 2. CÁMARAS DISPOSITIVOS MÓVILES ANDROID (Entrada / Acceso e Interior)
+    # --------------------------------------------------------------------------
+    # Estas fuentes se activarán cuando configures los teléfonos Android con
+    # aplicaciones como 'IP Webcam' o 'RTSP Camera Server'.
+    # - Formato RTSP estándar Android:
+    cam_entrada:
+      - rtsp://{FRIGATE_CAM_USER}:{FRIGATE_CAM_PASS}@{FRIGATE_CAM_ENTRADA_IP}:{FRIGATE_CAM_PORT}/h264_ulaw.sdp
+      # Fallback opcional si usas stream HTTP MJPEG de IP Webcam:
+      # - "ffmpeg:http://{FRIGATE_CAM_USER}:{FRIGATE_CAM_PASS}@{FRIGATE_CAM_ENTRADA_IP}:{FRIGATE_CAM_PORT}/video#video=h264"
+
+    cam_interior:
+      - rtsp://{FRIGATE_CAM_USER}:{FRIGATE_CAM_PASS}@{FRIGATE_CAM_INTERIOR_IP}:{FRIGATE_CAM_PORT}/h264_ulaw.sdp
+      # Fallback opcional MJPEG:
+      # - "ffmpeg:http://{FRIGATE_CAM_USER}:{FRIGATE_CAM_PASS}@{FRIGATE_CAM_INTERIOR_IP}:{FRIGATE_CAM_PORT}/video#video=h264"
+
+cameras:
+  # ============================================================================
+  # CÁMARA DEMO / ZÓCALO CDMX (HABILITADA POR DEFECTO PARA PRUEBAS)
+  # ============================================================================
+  zocalo_cdmx:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/zocalo_cdmx
+          roles:
+            - record
+    record:
+      enabled: true
+
+  # ============================================================================
+  # CÁMARA 1 (ENTRADA / TORNICUETE RFID) - TELÉFONO ANDROID 1
+  # ============================================================================
+  cam_entrada:
+    # Mantenida en 'false' mientras no se tengan los celulares conectados a la red Wi-Fi,
+    # evitando errores de conexión continuos en los logs del NVR.
+    # Cambiar a 'true' una vez iniciada la app de cámara en el teléfono.
+    enabled: false
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/cam_entrada
+          roles:
+            - record
+    record:
+      enabled: true
+
+  # ============================================================================
+  # CÁMARA 2 (INTERIOR / PASILLO & SALA) - TELÉFONO ANDROID 2
+  # ============================================================================
+  cam_interior:
+    # Cambiar a 'true' cuando el segundo teléfono Android esté conectado.
+    enabled: false
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/cam_interior
+          roles:
+            - record
+    record:
+      enabled: true
+
+version: 0.14

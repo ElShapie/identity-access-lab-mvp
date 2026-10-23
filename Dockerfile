@@ -11,5 +11,5 @@ COPY app ./app
 RUN mkdir -p /srv/data && chown -R appuser:appuser /srv
 USER appuser
 EXPOSE 8000
-CMD ["sh", "-c", "python -m app.seed && exec gunicorn --bind 0.0.0.0:8000 --workers 2 --access-logfile - app.wsgi:app"]
+CMD ["sh", "-c", "python -m app.seed && exec gunicorn --bind 0.0.0.0:8000 --workers 4 --timeout 120 --access-logfile - app.wsgi:app"]
 

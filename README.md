@@ -53,14 +53,25 @@ La pantalla **Usuarios** muestra el directorio y los roles con el estilo del das
 ## Componentes
 
 - **Keycloak 26.7.3:** proveedor OIDC local; importa un realm de demostración al iniciar por primera vez.
-- **Flask + Gunicorn:** login OIDC, permisos por rol, CSRF, sesión y subconjunto SCIM 2.0.
+- **Flask + Gunicorn:** login OIDC, permisos por rol, CSRF, sesión, subconjunto SCIM 2.0 y portal de Cambio de Turno (`/turno`).
+- **NVR Frigate:** monitoreo centralizado de video, compatible con cámaras Android, cámara en vivo de prueba (Zócalo CDMX) y retransmisión RTSP/WebRTC para aplicaciones móviles.
+- **Módulo Móvil Flutter:** app para monitoreo de cámaras NVR en tiempo real y registro de relevos de guardia desde smartphones.
 - **SQLite:** persistencia local de usuarios y últimos 500 eventos.
-- **Docker Compose:** red interna, volúmenes persistentes, healthchecks y puertos ligados a localhost.
-- **Módulos opcionales:** ejemplos de RFID y Frigate conservados fuera del arranque predeterminado; un módulo de badge NFC para iniciar sesión acercando una tarjeta y ejercicios de Microsoft 365 requieren un tenant autorizado.
+- **Docker Compose:** red interna unificada, volúmenes persistentes, healthchecks y servicios centralizados (`keycloak`, `app`, `frigate`).
+- **Módulos opcionales:** ejemplos de RFID, badge NFC USB para inicio de sesión físico y ejercicios de Microsoft 365. Ver [`docs/GUIA_NVR_FRIGATE.md`](docs/GUIA_NVR_FRIGATE.md) y [`docs/MODULOS_OPCIONALES.md`](docs/MODULOS_OPCIONALES.md).
 
 La app ofrece una matriz pequeña: `admin`, `mantenimiento`, `auditor`, `consulta` y `sin_acceso`. Consulta el detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 Para las extensiones consulta [`docs/MODULOS_OPCIONALES.md`](docs/MODULOS_OPCIONALES.md). No son necesarias para iniciar el MVP.
+
+### NVR Frigate, Cámaras Android & App Móvil Flutter
+
+El laboratorio incluye el servicio de video **Frigate NVR** centralizado en `compose.yaml`:
+- **Portal de Cambio de Turno:** accede a <http://localhost:8000/turno> para registrar relevos y verificar el flujo de cámaras.
+- **Panel Frigate NVR:** accede a <http://localhost:8971> para supervisar las grabaciones y streams.
+- **Cámara en vivo (Zócalo CDMX):** habilitada por defecto como señal de prueba mediante go2rtc y HLS.
+- **Cámaras Android (Entrada e Interior):** configuradas y listas para vincular teléfonos mediante aplicaciones RTSP como *IP Webcam*.
+- **Aplicación Móvil en Flutter:** ubicada en [`modules/mobile_flutter/`](modules/mobile_flutter/), permite visualizar las cámaras por RTSP/MJPEG y asentar turnos desde el teléfono. Consulta la guía completa en [`docs/GUIA_NVR_FRIGATE.md`](docs/GUIA_NVR_FRIGATE.md).
 
 ### Inicio de sesión con badge NFC (opcional)
 

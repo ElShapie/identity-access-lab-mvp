@@ -18,10 +18,12 @@
     <div class="nav-label">ESPACIO DE TRABAJO</div>
     <nav aria-label="Navegación principal">
       <a class="nav-item {% if page == 'home' %}active{% endif %}" href="/"><span class="nav-icon">⌂</span><span>Resumen</span></a>
+      <a class="nav-item {% if page == 'turno' %}active{% endif %}" href="/turno"><span class="nav-icon">⇄</span><span>Cambio de Turno</span></a>
       <a class="nav-item {% if page == 'consultation' %}active{% endif %}" href="/consulta"><span class="nav-icon">◫</span><span>Consulta</span></a>
       <a class="nav-item" href="/registros"><span class="nav-icon">◷</span><span>Bitácora</span></a>
       <a class="nav-item" href="/admin/usuarios"><span class="nav-icon">♙</span><span>Usuarios</span></a>
       {% if user.title == 'admin' %}<a class="nav-item {% if page == 'nfc' %}active{% endif %}" href="/nfc"><span class="nav-icon">▤</span><span>Badge NFC</span></a>{% endif %}
+      <a class="nav-item" href="https://localhost:8971" target="_blank" rel="noopener"><span class="nav-icon">📹</span><span>Cámaras Frigate</span></a>
     </nav>
     <div class="sidebar-spacer"></div>
     <div class="sidebar-note"><span class="status-dot"></span> Entorno local de demostración</div>
@@ -53,6 +55,7 @@
       </section>
       <section class="section-heading"><div><p class="eyebrow">ACCESOS</p><h2>Herramientas del laboratorio</h2></div></section>
       <section class="feature-grid">
+        <a class="feature-card" href="/turno"><span class="feature-icon orange">⇄</span><span><strong>Cambio de Turno</strong><small>Asienta el relevo de guardia y el estado de cámaras del SOC.</small></span><span class="arrow">→</span></a>
         <a class="feature-card" href="/consulta"><span class="feature-icon blue">⌕</span><span><strong>Consulta</strong><small>Abre el área de consulta disponible para tu perfil.</small></span><span class="arrow">→</span></a>
         <a class="feature-card" href="/registros"><span class="feature-icon violet">◷</span><span><strong>Bitácora</strong><small>Revisa los eventos de acceso autorizados para tu perfil.</small></span><span class="arrow">→</span></a>
         <a class="feature-card" href="/admin/usuarios"><span class="feature-icon green">♙</span><span><strong>Usuarios</strong><small>Consulta las cuentas locales del laboratorio.</small></span><span class="arrow">→</span></a>
