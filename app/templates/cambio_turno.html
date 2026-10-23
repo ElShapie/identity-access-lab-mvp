@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub de Seguridad & Control Operativo | Cambio de Turno · Identity Access Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #f7f7f8;
+      --surface: #ffffff;
+      --sidebar: #202124;
+      --sidebar-hover: #2d2f34;
+      --border: #e3e4e8;
+      --border-subtle: #f0f1f3;
+      --text-primary: #1f2328;
+      --text-secondary: #59636e;
+      --text-muted: #8c959f;
+      
+      --action: #146ef5;
+      --action-hover: #0b5bd4;
+      --action-subtle: rgba(20, 110, 245, 0.08);
+
+      --success: #23834a;
+      --success-subtle: rgba(35, 131, 74, 0.1);
+      
+      --warning: #c35b17;
+      --warning-subtle: rgba(195, 91, 23, 0.1);
+      
+      --danger: #c91c2b;
+      --danger-subtle: rgba(201, 28, 43, 0.1);
+
+      --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+      --shadow-card: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.03);
+      --shadow-card-hover: 0 6px 16px rgba(16, 24, 40, 0.08);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========================================================
+       SIDEBAR
+       ======================================================== */
+    .sidebar {
+      width: 270px;
+      background-color: var(--sidebar);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      user-select: none;
+    }
+
+    .brand {
+      padding: 24px 22px 20px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--action);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(20, 110, 245, 0.35);
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .brand-text h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .brand-text span {
+      font-size: 11px;
+      color: #9aa0a6;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+    }
+
+    .nav-section {
+      padding: 20px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #80868b;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 8px 12px 4px 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      color: #bdc1c6;
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      transition: all 0.18s ease;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background-color: var(--sidebar-hover);
+      color: #ffffff;
+    }
+
+    .nav-item.active {
+      background: rgba(20, 110, 245, 0.15);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3.5px;
+      background-color: var(--action);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+      opacity: 0.85;
+    }
+
+    .pill-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(20, 110, 245, 0.2);
+      color: #60a5fa;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      background: #18191b;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-badge {
+      width: 34px;
+      height: 34px;
+      background: #2f333a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .user-info {
+      line-height: 1.25;
+    }
+
+    .user-info .name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #e8eaed;
+    }
+
+    .user-info .role {
+      font-size: 11px;
+      color: #9aa0a6;
+    }
+
+    /* ========================================================
+       MAIN WRAPPER & HEADER
+       ======================================================== */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .top-header {
+      background: var(--surface);
+      height: 64px;
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .header-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+    }
+
+    .breadcrumb-root {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .breadcrumb-sep {
+      color: var(--text-muted);
+    }
+
+    .breadcrumb-current {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .header-status-bar {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .lan-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--success-subtle);
+      color: var(--success);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(35, 131, 74, 0.2);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--success);
+      box-shadow: 0 0 0 0 rgba(35, 131, 74, 0.6);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(35, 131, 74, 0.6); }
+      70% { box-shadow: 0 0 0 7px rgba(35, 131, 74, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(35, 131, 74, 0); }
+    }
+
+    .clock-display {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ========================================================
+       CONTENT SCROLLABLE
+       ======================================================== */
+    .content-area {
+      flex: 1;
+      padding: 28px 32px 40px 32px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* KPI METRICS CARDS */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      box-shadow: var(--shadow-card-hover);
+      border-color: #d0d2d7;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent;
+    }
+
+    .kpi-card.blue::before { background: var(--action); }
+    .kpi-card.green::before { background: var(--success); }
+    .kpi-card.orange::before { background: var(--warning); }
+    .kpi-card.red::before { background: var(--danger); }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .kpi-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-icon {
+      color: var(--text-muted);
+    }
+
+    .kpi-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-footnote {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* TWO-COLUMN LAYOUT */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* CARD CONTAINER */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title-group h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .card-title-group p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .badge-counter {
+      background: var(--action-subtle);
+      color: var(--action);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(20, 110, 245, 0.2);
+    }
+
+    /* FORM ELEMENTS STYLING */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-label span.req {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .input-field, .select-field, .textarea-field {
+      width: 100%;
+      font-family: inherit;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      background-color: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      transition: all 0.18s ease;
+      outline: none;
+    }
+
+    .input-field:focus, .select-field:focus, .textarea-field:focus {
+      border-color: var(--action);
+      box-shadow: 0 0 0 3px rgba(20, 110, 245, 0.12);
+    }
+
+    .input-field::placeholder, .textarea-field::placeholder {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .textarea-field {
+      resize: vertical;
+      min-height: 84px;
+      line-height: 1.5;
+    }
+
+    /* CAMERAS SELECTION TILES */
+    .camera-check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .camera-tile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-main);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+
+    .camera-tile:hover {
+      background: #ffffff;
+      border-color: #cbd0d6;
+    }
+
+    .camera-tile input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--action);
+      cursor: pointer;
+    }
+
+    .camera-tile-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .camera-tile-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .camera-tile-sub {
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    /* ACTION BUTTON */
+    .btn-submit {
+      width: 100%;
+      background-color: var(--action);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 11px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(20, 110, 245, 0.25);
+      transition: all 0.18s ease;
+      margin-top: 24px;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--action-hover);
+      box-shadow: 0 4px 12px rgba(20, 110, 245, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* LOGS TIMELINE / FEED */
+    .logs-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-main);
+      color: var(--text-primary);
+    }
+
+    .logs-scroll-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .logs-scroll-area::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .logs-scroll-area::-webkit-scrollbar-thumb {
+      background: #d8d9de;
+      border-radius: 4px;
+    }
+
+    /* LOG ITEM CARD */
+    .log-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .log-card:hover {
+      border-color: #cbd0d8;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .log-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .log-operator-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .op-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    .op-details .op-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .op-details .op-time {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* BADGES */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .status-badge.success {
+      background: var(--success-subtle);
+      color: var(--success);
+      border: 1px solid rgba(35, 131, 74, 0.25);
+    }
+
+    .status-badge.warning {
+      background: var(--warning-subtle);
+      color: var(--warning);
+      border: 1px solid rgba(195, 91, 23, 0.25);
+    }
+
+    .status-badge.danger {
+      background: var(--danger-subtle);
+      color: var(--danger);
+      border: 1px solid rgba(201, 28, 43, 0.25);
+    }
+
+    .log-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      background: var(--bg-main);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      border-left: 3px solid var(--border);
+    }
+
+    .log-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+    }
+
+    .cameras-tags {
+      display: flex;
+      gap: 6px;
+    }
+
+    .cam-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .cam-tag.active {
+      color: var(--success);
+      border-color: rgba(35, 131, 74, 0.3);
+      background: rgba(35, 131, 74, 0.04);
+    }
+
+    .shift-tag {
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 12px;
+      stroke: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    .empty-state h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .empty-state p {
+      font-size: 12px;
+    }
+
+    /* PREVIEW CARD FOR FRIGATE */
+    .frigate-preview-banner {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #fff;
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #334155;
+    }
+
+    .frigate-preview-banner .info h3 {
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .frigate-preview-banner .info p {
+      font-size: 11.5px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .frigate-link-btn {
+      background: var(--action);
+      color: #fff;
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .frigate-link-btn:hover {
+      background: var(--action-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar">
+    <a href="/" class="brand">
+      <div class="brand-icon">SOC</div>
+      <div class="brand-text">
+        <h1>SOC CENTRAL</h1>
+        <span>Aeropuerto Hub LAN</span>
+      </div>
+    </a>
+
+    <nav class="nav-section">
+      <div class="nav-label">Operaciones</div>
+      <a href="/" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard General
+      </a>
+      <a href="/turno" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Cambio de Turno
+      </a>
+      <a href="https://localhost:8971" target="_blank" rel="noopener" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Cámaras & Frigate
+        <span class="pill-badge">NVR :8971</span>
+      </a>
+
+      <div class="nav-label" style="margin-top:12px;">Auditoría & Eventos</div>
+      <a href="/registros" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Wazuh / Logs RFID
+      </a>
+      <a href="/admin/usuarios" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Directorio / SCIM
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="avatar-badge">{{ (user.displayName or user.userName)[0]|upper if user else 'OP' }}</div>
+      <div class="user-info">
+        <div class="name">{{ user.displayName or user.userName if user else 'Guardia SOC Activa' }}</div>
+        <div class="role">{{ user.title or 'Nivel 1 · Seguridad Física' if user else 'Nivel 1 · Ubuntu Host' }}</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+  <div class="main-wrapper">
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <div class="header-breadcrumb">
+        <a href="/" class="breadcrumb-root" style="text-decoration:none;">Hub SOC</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Control de Turnos & Bitácora</span>
+      </div>
+
+      <div class="header-status-bar">
+        <div class="lan-pill">
+          <span class="pulse-dot"></span>
+          <span>LAN Isolated &bull; En Línea</span>
+        </div>
+        <div class="clock-display" id="liveClock">--:--:--</div>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <div class="content-area">
+
+      <!-- BANNER DE ENLACE DIRECTO AL NVR FRIGATE -->
+      <section class="frigate-preview-banner">
+        <div class="info">
+          <h3>
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            NVR Frigate Centralizado en Puerto :8971
+          </h3>
+          <p>Señal de monitoreo en tiempo real, 2 cámaras móviles Android y cámara en vivo Zócalo CDMX.</p>
+        </div>
+        <a href="https://localhost:8971" target="_blank" rel="noopener" class="frigate-link-btn">
+          Abrir Monitor Frigate &rarr;
+        </a>
+      </section>
+
+      <!-- KPI METRIC CARDS -->
+      <section class="kpi-grid">
+        <div class="kpi-card blue">
+          <div class="kpi-header">
+            <span class="kpi-title">Turno Activo</span>
+            <span class="kpi-icon">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+          </div>
+          <div class="kpi-value" id="currentShiftDisplay">Tarde</div>
+          <div class="kpi-footnote">Rotación estándar 8h</div>
+        </div>
+
+        <div class="kpi-card green">
+          <div class="kpi-header">
+            <span class="kpi-title">Cámaras App</span>
+            <span class="kpi-icon">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </span>
+          </div>
+          <div class="kpi-value" id="camStatusDisplay">2 / 2 OK</div>
+          <div class="kpi-footnote">Frigate RTSP / MJPEG Feed</div>
+        </div>
+
+        <div class="kpi-card orange">
+          <div class="kpi-header">
+            <span class="kpi-title">Registros Turno</span>
+            <span class="kpi-icon">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </span>
+          </div>
+          <div class="kpi-value" id="totalLogsDisplay">0</div>
+          <div class="kpi-footnote">Eventos y relevos guardados</div>
+        </div>
+
+        <div class="kpi-card red">
+          <div class="kpi-header">
+            <span class="kpi-title">Alertas Wazuh</span>
+            <span class="kpi-icon">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </span>
+          </div>
+          <div class="kpi-value" id="dangerAlertsDisplay">0</div>
+          <div class="kpi-footnote">Accesos denegados / Nivel 8</div>
+        </div>
+      </section>
+
+      <!-- TWO COLUMN LAYOUT: FORM & LOGS FEED -->
+      <div class="dashboard-layout">
+        
+        <!-- FORM CARD -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h2>Registrar Relevo de Guardia</h2>
+              <p>Traspaso formal de responsabilidades operativas</p>
+            </div>
+            <span class="badge-counter">Formulario SOC</span>
+          </div>
+
+          <form id="shiftForm" onsubmit="event.preventDefault(); addLog();">
+            <div class="form-group">
+              <label class="form-label" for="operator">Operador a Cargo <span class="req">*</span></label>
+              <input type="text" id="operator" class="input-field" placeholder="Ej. Carlos M. (ID-409)" value="{{ user.displayName or user.userName if user else '' }}" required autocomplete="off" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="shift">Turno Saliente / Entrante <span class="req">*</span></label>
+              <select id="shift" class="select-field">
+                <option value="mañana">Mañana (06:00 - 14:00)</option>
+                <option value="tarde" selected>Tarde (14:00 - 22:00)</option>
+                <option value="noche">Noche (22:00 - 06:00)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Verificación de Flujo de Cámaras (App Flutter)</label>
+              <div class="camera-check-grid">
+                <label class="camera-tile">
+                  <input type="checkbox" id="cam1" checked />
+                  <div class="camera-tile-text">
+                    <span class="camera-tile-name">Cámara 1 (Acceso)</span>
+                    <span class="camera-tile-sub">Lector RFID / Torniquete</span>
+                  </div>
+                </label>
+
+                <label class="camera-tile">
+                  <input type="checkbox" id="cam2" checked />
+                  <div class="camera-tile-text">
+                    <span class="camera-tile-name">Cámara 2 (Interior)</span>
+                    <span class="camera-tile-sub">Pasillo Salidas & Espera</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="status">Diagnóstico del Estado Operativo <span class="req">*</span></label>
+              <select id="status" class="select-field">
+                <option value="success">&#9679; Conforme (Sin incidencias críticas)</option>
+                <option value="warning">&#9679; Advertencia (Novedades menores / Observación)</option>
+                <option value="danger">&#9679; Peligro / Incidencia (Alertas Wazuh o cámaras caídas)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="description">Bitácora & Novedades del Turno</label>
+              <textarea id="description" class="textarea-field" placeholder="Detalle eventos relevantes: intentos denegados, anomalías en cámaras, soporte a IT o seguridad física..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar en Bitácora Oficial
+            </button>
+          </form>
+        </section>
+
+        <!-- LOGS FEED CARD -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h2>Bitácora de Relevos & Logs</h2>
+              <p>Historial cronológico auditado de cambios de turno</p>
+            </div>
+            <div class="logs-header-actions">
+              <button class="btn-secondary" onclick="exportLogsJSON()">Exportar</button>
+              <button class="btn-secondary" onclick="clearAllLogs()">Limpiar</button>
+            </div>
+          </div>
+
+          <div class="logs-scroll-area" id="logContainer">
+            <!-- Dinámicamente poblado -->
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const logKey = 'cambioTurnoLogs_v2';
+
+    // Reloj en vivo
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('liveClock').textContent = timeStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function getStatusBadge(status) {
+      if (status === 'success') {
+        return `<span class="status-badge success">&#9679; Éxito</span>`;
+      } else if (status === 'warning') {
+        return `<span class="status-badge warning">&#9679; Advertencia</span>`;
+      } else {
+        return `<span class="status-badge danger">&#9679; Peligro</span>`;
+      }
+    }
+
+    function getInitials(name) {
+      if (!name) return 'OP';
+      const parts = name.trim().split(' ');
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return name.slice(0, 2).toUpperCase();
+    }
+
+    function loadLogs() {
+      const logs = JSON.parse(localStorage.getItem(logKey) || '[]');
+      const container = document.getElementById('logContainer');
+      container.innerHTML = '';
+
+      // Actualizar contadores en KPIs
+      document.getElementById('totalLogsDisplay').textContent = logs.length;
+      const dangerCount = logs.filter(l => l.status === 'danger').length;
+      document.getElementById('dangerAlertsDisplay').textContent = dangerCount;
+
+      if (logs.length > 0) {
+        const lastShift = logs[logs.length - 1].shift;
+        document.getElementById('currentShiftDisplay').textContent = lastShift.charAt(0).toUpperCase() + lastShift.slice(1);
+      }
+
+      if (logs.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <h3>Sin registros aún</h3>
+            <p>Completa el formulario lateral para asentar el primer cambio de turno de la jornada.</p>
+          </div>
+        `;
+        return;
+      }
+
+      logs.slice().reverse().forEach((entry) => {
+        const card = document.createElement('div');
+        card.className = 'log-card';
+
+        const cam1Active = entry.cams && entry.cams.includes('Cámara 1');
+        const cam2Active = entry.cams && entry.cams.includes('Cámara 2');
+
+        const descText = entry.description
+          ? escapeHTML(entry.description)
+          : '<em>Sin novedades extraordinarias reportadas.</em>';
+
+        card.innerHTML = `
+          <div class="log-card-header">
+            <div class="log-operator-meta">
+              <div class="op-avatar">${getInitials(entry.operator)}</div>
+              <div class="op-details">
+                <div class="op-name">${escapeHTML(entry.operator)}</div>
+                <div class="op-time">${entry.time}</div>
+              </div>
+            </div>
+            ${getStatusBadge(entry.status)}
+          </div>
+
+          <div class="log-body">
+            ${descText}
+          </div>
+
+          <div class="log-footer">
+            <div class="cameras-tags">
+              <span class="cam-tag ${cam1Active ? 'active' : ''}">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
+                Cam 1: ${cam1Active ? 'OK' : 'Fallo'}
+              </span>
+              <span class="cam-tag ${cam2Active ? 'active' : ''}">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
+                Cam 2: ${cam2Active ? 'OK' : 'Fallo'}
+              </span>
+            </div>
+
+            <div class="shift-tag">Turno ${entry.shift}</div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function addLog() {
+      const operatorInput = document.getElementById('operator');
+      const operator = operatorInput.value.trim();
+      const shift = document.getElementById('shift').value;
+      const status = document.getElementById('status').value;
+      const description = document.getElementById('description').value.trim();
+
+      const cams = [];
+      if (document.getElementById('cam1').checked) cams.push('Cámara 1');
+      if (document.getElementById('cam2').checked) cams.push('Cámara 2');
+
+      if (!operator) {
+        operatorInput.focus();
+        return;
+      }
+
+      const now = new Date();
+      const timeFormatted = now.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) + ' · ' +
+                            now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+      const entry = {
+        operator,
+        shift,
+        status,
+        description,
+        cams,
+        time: timeFormatted,
+        timestamp: Date.now()
+      };
+
+      const logs = JSON.parse(localStorage.getItem(logKey) || '[]');
+      logs.push(entry);
+      localStorage.setItem(logKey, JSON.stringify(logs));
+
+      // Sincronizar en segundo plano con el backend del Lab (crea evento en la bitácora)
+      fetch('/api/turno', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      }).catch(err => console.log('Sincronización local offline'));
+
+      loadLogs();
+
+      // Limpiar descripción y reenfocar
+      document.getElementById('description').value = '';
+    }
+
+    function clearAllLogs() {
+      if (confirm('¿Confirmas que deseas reiniciar la bitácora de turnos local?')) {
+        localStorage.removeItem(logKey);
+        loadLogs();
+      }
+    }
+
+    function exportLogsJSON() {
+      const logs = localStorage.getItem(logKey) || '[]';
+      const blob = new Blob([logs], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bitacora_turnos_soc_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+
+    // Carga inicial
+    loadLogs();
+  </script>
+</body>
+</html>

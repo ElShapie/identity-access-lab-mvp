@@ -247,6 +247,23 @@ class NfcRouteTests(unittest.TestCase):
         with self.client.session_transaction() as session:
             self.assertNotIn("uid", session)
 
+    def test_shift_change_page_and_api(self):
+        """Verifica que la vista de cambio de turno y su API de auditoria funcionen."""
+        response = self.client.get("/turno")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Hub de Seguridad", response.get_data(as_text=True))
+
+        api_response = self.client.post("/api/turno", json={
+            "operator": "Guardia Carlos M.",
+            "shift": "tarde",
+            "status": "success",
+            "cams": ["Cámara 1", "Cámara 2"]
+        })
+        self.assertEqual(api_response.status_code, 200)
+        self.assertTrue(api_response.json["ok"])
+        events = self.store.events()
+        self.assertTrue(any("TURNO_TARDE" in e["action"] for e in events))
+
 
 if __name__ == "__main__":
     unittest.main()

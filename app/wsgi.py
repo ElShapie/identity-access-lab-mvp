@@ -5,7 +5,7 @@ import secrets
 import sqlite3
 from datetime import timedelta
 from functools import wraps
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import requests
 from authlib.integrations.flask_client import OAuth
@@ -29,6 +29,7 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.environ["APP_SECRET"]
     app.config.update(
+        SESSION_COOKIE_NAME="identity_access_lab_session",
         SESSION_COOKIE_SECURE=False,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
@@ -204,6 +205,8 @@ def create_app():
 
     @app.get("/login")
     def login():
+        if request.host != urlparse(base).netloc:
+            return redirect(base + "/login")
         return oauth.idp.authorize_redirect(base + "/auth/callback", prompt="login")
 
     @app.get("/auth/callback")
@@ -224,7 +227,7 @@ def create_app():
             store.event(user["id"], "LOGIN_OIDC", "PERMITIDO")
             return redirect("/")
         except Exception:
-            app.logger.warning("Inicio OIDC rechazado o incompleto")
+            app.logger.exception("Inicio OIDC rechazado o incompleto")
             abort(403)
 
     @app.get("/consulta")
@@ -246,6 +249,34 @@ def create_app():
     @require("registros")
     def records():
         return render_template("dashboard.html", title="Bitácora", page="events", user=store.get(session["uid"]), users=[], events=store.events(), csrf=session.get("csrf"))
+
+    @app.get("/turno")
+    def shift_change():
+        user = store.get(session["uid"]) if session.get("uid") else None
+        return render_template(
+            "cambio_turno.html",
+            title="Cambio de Turno",
+            page="turno",
+            user=user,
+            csrf=session.get("csrf"),
+        )
+
+    @app.route("/api/turno", methods=["GET", "POST"])
+    def api_shift_change():
+        if request.method == "POST":
+            payload = request.get_json(silent=True) or request.form.to_dict() or {}
+            operator = str(payload.get("operator", "Operador SOC")).strip()
+            shift = str(payload.get("shift", "tarde")).strip().lower()
+            status = str(payload.get("status", "success")).strip().lower()
+            cams = payload.get("cams", [])
+            cams_str = ", ".join(cams) if isinstance(cams, list) else str(cams)
+            action_desc = f"TURNO_{shift.upper()}"
+            if cams_str:
+                action_desc += f" [CAMS: {cams_str}]"
+            result_label = "CONFORME" if status == "success" else ("ADVERTENCIA" if status == "warning" else "INCIDENCIA")
+            store.event(operator, action_desc, result_label)
+            return jsonify(ok=True)
+        return jsonify(events=store.events())
 
     @app.post("/nfc/tap")
     def nfc_tap():

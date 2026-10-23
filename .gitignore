@@ -7,3 +7,10 @@ data/
 .venv/
 .task-tmp/
 .pytest_cache/
+frigate/storage/
+frigate/config/*.db
+frigate/config/*.db-shm
+frigate/config/*.db-wal
+frigate/config/.exports
+frigate/config/.timeline
+frigate/config/.vacuum

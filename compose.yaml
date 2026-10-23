@@ -19,6 +19,7 @@ services:
       DEMO_PASSWORD_SEGURIDAD_FISICA: ${DEMO_PASSWORD_SEGURIDAD_FISICA:?Falta DEMO_PASSWORD_SEGURIDAD_FISICA}
     ports:
       - "127.0.0.1:8081:8080"
+      - "[::1]:8081:8080"
     volumes:
       - ./keycloak/identity-access-realm.json:/opt/keycloak/data/import/identity-access-realm.json:ro
       - keycloak_data:/opt/keycloak/data
@@ -58,6 +59,7 @@ services:
       NFC_TAP_TTL_SECONDS: ${NFC_TAP_TTL_SECONDS:-15}
     ports:
       - "127.0.0.1:8000:8000"
+      - "[::1]:8000:8000"
     volumes:
       - app_data:/srv/data
     depends_on:
@@ -70,6 +72,35 @@ services:
       retries: 10
       start_period: 15s
     restart: unless-stopped
+
+  frigate:
+    container_name: identity-access-frigate
+    image: ghcr.io/blakeblackshear/frigate:${FRIGATE_VERSION:-0.14.1}
+    restart: unless-stopped
+    stop_grace_period: 30s
+    shm_size: "256mb"
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      TZ: ${TZ:-America/Mexico_City}
+      FRIGATE_CAM_USER: ${FRIGATE_CAM_USER:-admin}
+      FRIGATE_CAM_PASS: ${FRIGATE_CAM_PASS:-admin}
+      FRIGATE_CAM_ENTRADA_IP: ${FRIGATE_CAM_ENTRADA_IP:-192.168.1.101}
+      FRIGATE_CAM_INTERIOR_IP: ${FRIGATE_CAM_INTERIOR_IP:-192.168.1.102}
+      FRIGATE_CAM_PORT: ${FRIGATE_CAM_PORT:-8080}
+    volumes:
+      - ./frigate/config:/config
+      - ./frigate/storage:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "8971:8971"       # Interfaz Web HTTPS & API autenticada
+      - "5000:5000"       # Interfaz Web HTTP plano / API local (ideal para app Flutter)
+      - "8554:8554"       # go2rtc RTSP Feed (Conexión para Flutter / VLC)
+      - "8555:8555/tcp"   # go2rtc WebRTC
+      - "8555:8555/udp"   # go2rtc WebRTC
 
 volumes:
   app_data:
