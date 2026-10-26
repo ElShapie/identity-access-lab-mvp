@@ -14,3 +14,9 @@ frigate/config/*.db-wal
 frigate/config/.exports
 frigate/config/.timeline
 frigate/config/.vacuum
+
+.env
+*.bak
+frigate/storage/
+frigate/config/*
+!frigate/config/config.yml
