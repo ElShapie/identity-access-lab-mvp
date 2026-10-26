@@ -7,7 +7,7 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Copia .env.example a .env}
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
-      KC_HOSTNAME: http://localhost:8081
+      KC_HOSTNAME: http://172.16.0.57:8081
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?Falta OIDC_CLIENT_SECRET}
       DEMO_PASSWORD_ENGINEER: ${DEMO_PASSWORD_ENGINEER:?Falta DEMO_PASSWORD_ENGINEER}
       DEMO_PASSWORD_AUDITOR: ${DEMO_PASSWORD_AUDITOR:?Falta DEMO_PASSWORD_AUDITOR}
@@ -18,8 +18,7 @@ services:
       DEMO_PASSWORD_SOC_AUDITORIA: ${DEMO_PASSWORD_SOC_AUDITORIA:?Falta DEMO_PASSWORD_SOC_AUDITORIA}
       DEMO_PASSWORD_SEGURIDAD_FISICA: ${DEMO_PASSWORD_SEGURIDAD_FISICA:?Falta DEMO_PASSWORD_SEGURIDAD_FISICA}
     ports:
-      - "127.0.0.1:8081:8080"
-      - "[::1]:8081:8080"
+      - "8081:8080"
     volumes:
       - ./keycloak/identity-access-realm.json:/opt/keycloak/data/import/identity-access-realm.json:ro
       - keycloak_data:/opt/keycloak/data
@@ -58,8 +57,7 @@ services:
       NFC_LOGIN_PASSWORD: ${NFC_LOGIN_PASSWORD:-}
       NFC_TAP_TTL_SECONDS: ${NFC_TAP_TTL_SECONDS:-15}
     ports:
-      - "127.0.0.1:8000:8000"
-      - "[::1]:8000:8000"
+      - "8000:8000"
     volumes:
       - app_data:/srv/data
     depends_on:
@@ -90,7 +88,7 @@ services:
       FRIGATE_CAM_PORT: ${FRIGATE_CAM_PORT:-8080}
     volumes:
       - ./frigate/config:/config
-      - ./frigate/storage:/media/frigate
+      - frigate_storage:/media/frigate
       - type: tmpfs
         target: /tmp/cache
         tmpfs:
@@ -105,3 +103,4 @@ services:
 volumes:
   app_data:
   keycloak_data:
+  frigate_storage:

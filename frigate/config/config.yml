@@ -17,8 +17,8 @@ detect:
 record:
   enabled: true
   retain:
-    days: 3
-    mode: motion # Solo guarda segmentos con movimiento: evita llenar el disco del host
+    days: 1
+    mode: all # Solo guarda segmentos con movimiento: evita llenar el disco del host
 
 snapshots:
   enabled: true
@@ -30,6 +30,9 @@ birdseye:
   mode: continuous
 
 go2rtc:
+  webrtc:
+    candidates:
+      - 172.16.0.57:8555
   streams:
     # --------------------------------------------------------------------------
     # 1. CÁMARA DEMO / STREAM EN VIVO (Zócalo CDMX / HLS Test)
@@ -48,7 +51,7 @@ go2rtc:
     # aplicaciones como 'IP Webcam' o 'RTSP Camera Server'.
     # - Formato RTSP estándar Android:
     cam_entrada:
-      - rtsp://{FRIGATE_CAM_USER}:{FRIGATE_CAM_PASS}@{FRIGATE_CAM_ENTRADA_IP}:{FRIGATE_CAM_PORT}/h264_ulaw.sdp
+      - "ffmpeg:http://{FRIGATE_CAM_USER}:{FRIGATE_CAM_PASS}@{FRIGATE_CAM_ENTRADA_IP}:{FRIGATE_CAM_PORT}/video#video=h264"
       # Fallback opcional si usas stream HTTP MJPEG de IP Webcam:
       # - "ffmpeg:http://{FRIGATE_CAM_USER}:{FRIGATE_CAM_PASS}@{FRIGATE_CAM_ENTRADA_IP}:{FRIGATE_CAM_PORT}/video#video=h264"
 
@@ -78,7 +81,7 @@ cameras:
     # Mantenida en 'false' mientras no se tengan los celulares conectados a la red Wi-Fi,
     # evitando errores de conexión continuos en los logs del NVR.
     # Cambiar a 'true' una vez iniciada la app de cámara en el teléfono.
-    enabled: false
+    enabled: true
     ffmpeg:
       inputs:
         - path: rtsp://127.0.0.1:8554/cam_entrada
